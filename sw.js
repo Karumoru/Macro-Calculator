@@ -1,4 +1,4 @@
-const cacheName = 'macro-v9-final';
+const cacheName = 'macro-v10-final';
 const assets = [
   './',
   './index.html',
@@ -25,3 +25,4 @@ self.addEventListener('fetch', (e) => {
     })
   );
 });
+
