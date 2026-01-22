@@ -1,10 +1,9 @@
 {
   "name": "Macro Calculator",
   "short_name": "Macros",
-  "id": "/macro-solver/",
+  "id": "/macro-calc/",
   "start_url": "./index.html",
   "display": "standalone",
-  "orientation": "portrait",
   "background_color": "#000000",
   "theme_color": "#000000",
   "icons": [
@@ -22,4 +21,3 @@
     }
   ]
 }
-
