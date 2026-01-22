@@ -45,7 +45,8 @@
 </div>
 
 <script>
-    const MILK = { p: 6.8, f: 7.8, c: 9.9, cal: 137 };
+const MILK = { p: 6.8, f: 7.8, c: 9.9, cal: 137 };
+
     function calculate() {
         const pI = document.getElementById('protein'), cI = document.getElementById('carbs'), fI = document.getElementById('fats'), calI = document.getElementById('calories');
         const p = pI.value === '' ? null : parseFloat(pI.value), c = cI.value === '' ? null : parseFloat(cI.value), f = fI.value === '' ? null : parseFloat(fI.value), cal = calI.value === '' ? null : parseFloat(calI.value);
@@ -54,6 +55,7 @@
         else if (c === null) { cI.value = ((cal-(p*4)-(f*9))/4).toFixed(1); cI.classList.add('calculated-field'); }
         else if (f === null) { fI.value = ((cal-(p*4)-(c*4))/9).toFixed(1); fI.classList.add('calculated-field'); }
     }
+
     function subtractMilk() {
         let p = parseFloat(document.getElementById('protein').value) || 0, c = parseFloat(document.getElementById('carbs').value) || 0, f = parseFloat(document.getElementById('fats').value) || 0, cal = parseFloat(document.getElementById('calories').value) || 0;
         document.getElementById('adj-p').innerText = (p - MILK.p).toFixed(1) + "g";
@@ -62,10 +64,33 @@
         document.getElementById('adj-cal').innerText = Math.round(cal - MILK.cal);
         document.getElementById('adjusted-box').style.display = 'block';
     }
+
     function clearFields() { document.querySelectorAll('input').forEach(i => {i.value=''; i.classList.remove('calculated-field');}); document.getElementById('adjusted-box').style.display='none'; }
     
-    // OFFLINE SERVICE WORKER REGISTRATION
-    if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js'); }
+    // --- DIAGNOSTIC SERVICE WORKER SECTION ---
+    const msg = document.getElementById('message');
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js')
+        .then((reg) => {
+            msg.innerText = "✓ System Ready (App Mode Active)";
+            msg.style.color = "green";
+            console.log("SW Registered");
+        })
+        .catch((err) => {
+            msg.innerText = "✗ System Error: Service Worker failed";
+            msg.style.color = "red";
+            console.log("SW Failed", err);
+        });
+    } else {
+        msg.innerText = "✗ Browser does not support App Mode";
+    }
+
+    // Capture the 'Install' prompt event
+    window.addEventListener('beforeinstallprompt', (e) => {
+        msg.innerText = "⭐ Tap 'Install' in your Menu now!";
+        msg.style.fontWeight = "bold";
+    });
 </script>
 </body>
 </html>
