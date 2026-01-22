@@ -8,16 +8,17 @@
   "theme_color": "#000000",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/1043/1043440.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/2316/2316952.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/1043/1043440.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/2316/2316952.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
     }
   ]
+
 }
