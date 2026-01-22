@@ -1,34 +1,33 @@
-const cacheName = 'macro-v16';
-const assets = [
+const CACHE_NAME = 'macro-calc-v16'; // Increment this number every time you update index.html
+const ASSETS = [
   './',
   './index.html',
   './manifest.json'
 ];
 
-self.addEventListener('install', (e) => {
-  self.skipWaiting(); // Forces the new version to take over
-  e.waitUntil(
-    caches.open(cacheName).then((cache) => {
-      return cache.addAll(assets);
-    })
+// Install: Cache everything
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
+  self.skipWaiting(); // FORCE UPDATE: Tells the new service worker to take over immediately
 });
 
+// Activate: Clean up old caches
 self.addEventListener('activate', (event) => {
-  event.waitUntil(clients.claim()); // Immediate control
-});
-
-self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    caches.match(e.request).then((res) => {
-      return res || fetch(e.request);
+  event.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+      );
     })
   );
+  self.clients.claim(); // Take control of the page immediately
 });
 
-
-
-
-
-
-
+// Fetch: Serve from cache
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request).then((response) => response || fetch(event.request))
+  );
+});
