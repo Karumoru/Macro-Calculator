@@ -5,7 +5,7 @@
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f4f7f6",
-  "theme_color": "#4a90e2",
+  "theme_color": "#f4f7f6",
   "icons": [
     {
       "src": "https://cdn-icons-png.flaticon.com/512/1043/1043440.png",
@@ -20,4 +20,5 @@
       "purpose": "maskable"
     }
   ]
+
 }
