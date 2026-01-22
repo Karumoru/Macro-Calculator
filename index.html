@@ -4,13 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Macro Calculator</title>
-    
     <meta name="color-scheme" content="dark">
-    
     <meta name="theme-color" content="#000000">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
     <link rel="manifest" href="manifest.json">
 
     <style>
@@ -23,18 +20,16 @@
             --border: #38383a;
             --success: #32d74b;
             --error: #ff453a;
-            --warning: #ffd60a;
         }
 
         html { background-color: var(--bg); height: 100%; margin: 0; }
-
         body {
             font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg);
             margin: 0;
             display: flex;
-            justify-content: center;
-            align-items: flex-start;
+            flex-direction: column;
+            align-items: center;
             min-height: 100vh;
             color: var(--text);
             padding: env(safe-area-inset-top) 20px env(safe-area-inset-bottom) 20px;
@@ -49,12 +44,11 @@
             width: 100%;
             max-width: 350px;
             text-align: center;
-            margin-top: 20px;
             border: 1px solid var(--border);
+            margin-bottom: 20px;
         }
 
         h2 { margin: 0 0 1.2rem 0; color: var(--primary); font-size: 1.6rem; }
-
         .input-group { margin-bottom: 1.2rem; text-align: left; }
         label { display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.85rem; color: #8e8e93; }
         
@@ -68,7 +62,6 @@
             background: #2c2c2e;
             color: white;
             outline: none;
-            -webkit-appearance: none;
         }
 
         .calculated-field {
@@ -78,154 +71,184 @@
             font-weight: bold;
         }
 
-        .buttons { display: flex; gap: 10px; margin-top: 1.5rem; flex-wrap: wrap; }
-        
-        button {
-            flex: 1;
-            padding: 16px;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-        }
-
+        .buttons { display: flex; gap: 10px; margin-top: 1.5rem; }
+        button { flex: 1; padding: 16px; border: none; border-radius: 12px; cursor: pointer; font-size: 1rem; font-weight: 600; }
         #calcBtn { background-color: var(--primary); color: white; }
         #clearBtn { background-color: #3a3a3c; color: #fff; }
-        #milkBtn { background-color: #48484a; color: var(--warning); flex-basis: 100%; margin-top: 8px; }
 
-        #adjusted-box {
-            display: none;
-            margin-top: 20px;
-            padding: 15px;
-            border: 1px solid var(--error);
+        /* History Styles */
+        .history-container {
+            width: 100%;
+            max-width: 350px;
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+        .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .history-header h3 { margin: 0; font-size: 0.9rem; color: #8e8e93; text-transform: uppercase; letter-spacing: 1px; }
+        #clearHistory { background: transparent; color: #8e8e93; border: none; font-size: 0.75rem; cursor: pointer; }
+
+        .history-item {
+            background: #2c2c2e;
+            padding: 12px;
             border-radius: 12px;
-            background-color: #2c1616;
-            text-align: left;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            border: 1px solid transparent;
+            transition: transform 0.1s, border-color 0.2s;
+        }
+        
+        /* The main clickable area for restoring */
+        .history-click-area {
+            flex-grow: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
         }
 
-        .stat-row { display: flex; justify-content: space-between; margin-bottom: 6px; color: var(--error); font-weight: 600; }
-        #status-bar { margin-top: 20px; font-size: 0.7rem; color: #48484a; }
+        .history-data { display: flex; flex-direction: column; text-align: left; gap: 2px; }
+        .history-time { font-size: 0.7rem; color: #8e8e93; }
+        .history-cal { color: var(--success); font-weight: bold; font-size: 1rem; margin-right: 15px; }
+
+        /* The Delete Button */
+        .delete-btn {
+            color: #48484a;
+            font-size: 1.4rem;
+            font-weight: 300;
+            padding: 0 5px;
+            cursor: pointer;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+        .delete-btn:hover { color: var(--error); }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h2>Macro Calculator</h2>
-    
-    <div class="input-group">
-        <label>Protein (g)</label>
-        <input type="number" id="protein" placeholder="0" inputmode="decimal">
-    </div>
-
-    <div class="input-group">
-        <label>Carbs (g)</label>
-        <input type="number" id="carbs" placeholder="0" inputmode="decimal">
-    </div>
-
-    <div class="input-group">
-        <label>Fats (g)</label>
-        <input type="number" id="fats" placeholder="0" inputmode="decimal">
-    </div>
-
+    <div class="input-group"><label>Protein (g)</label><input type="number" id="protein" placeholder="0" inputmode="decimal"></div>
+    <div class="input-group"><label>Carbs (g)</label><input type="number" id="carbs" placeholder="0" inputmode="decimal"></div>
+    <div class="input-group"><label>Fats (g)</label><input type="number" id="fats" placeholder="0" inputmode="decimal"></div>
     <hr style="border:0; border-top:1px solid var(--border); margin: 1rem 0;">
-
-    <div class="input-group">
-        <label>Total Calories</label>
-        <input type="number" id="calories" placeholder="0" inputmode="numeric">
-    </div>
+    <div class="input-group"><label>Total Calories</label><input type="number" id="calories" placeholder="0" inputmode="numeric"></div>
 
     <div class="buttons">
         <button id="calcBtn" onclick="calculate()">Calculate</button>
         <button id="clearBtn" onclick="clearFields()">Clear</button>
-        <button id="milkBtn" onclick="subtractMilk()">Subtract Milk</button>
     </div>
+</div>
 
-    <div id="adjusted-box">
-        <h3 style="color: var(--error); margin: 0 0 12px 0; font-size: 0.9rem;">Adjusted (minus milk)</h3>
-        <div class="stat-row"><span>Protein:</span> <span id="adj-p">0g</span></div>
-        <div class="stat-row"><span>Carbs:</span> <span id="adj-c">0g</span></div>
-        <div class="stat-row"><span>Fats:</span> <span id="adj-f">0g</span></div>
-        <div class="stat-row"><span>Calories:</span> <span id="adj-cal">0</span></div>
+<div class="history-container">
+    <div class="history-header">
+        <h3>History</h3>
+        <button id="clearHistory" onclick="clearAllHistory()">Clear All</button>
     </div>
-
-    <div id="status-bar">Syncing...</div>
+    <div id="historyList"></div>
 </div>
 
 <script>
-    const MILK = { p: 6.8, f: 7.8, c: 9.9, cal: 137 };
+    window.onload = displayHistory;
 
     function calculate() {
-        const pI = document.getElementById('protein'), 
-              cI = document.getElementById('carbs'), 
-              fI = document.getElementById('fats'), 
-              calI = document.getElementById('calories');
+        const pI = document.getElementById('protein'), cI = document.getElementById('carbs'), 
+              fI = document.getElementById('fats'), calI = document.getElementById('calories');
         
         [pI, cI, fI, calI].forEach(el => el.classList.remove('calculated-field'));
 
-        const inputs = [
-            { id: 'p', val: pI.value === '' ? null : parseFloat(pI.value) },
-            { id: 'c', val: cI.value === '' ? null : parseFloat(cI.value) },
-            { id: 'f', val: fI.value === '' ? null : parseFloat(fI.value) },
-            { id: 'cal', val: calI.value === '' ? null : parseFloat(calI.value) }
-        ];
+        const p = pI.value === '' ? null : parseFloat(pI.value);
+        const c = cI.value === '' ? null : parseFloat(cI.value);
+        const f = fI.value === '' ? null : parseFloat(fI.value);
+        const cal = calI.value === '' ? null : parseFloat(calI.value);
 
-        const filledCount = inputs.filter(i => i.val !== null).length;
-
-        if (filledCount !== 3) {
-            alert("Please fill in exactly 3 boxes to calculate the 4th.");
+        if ([p, c, f, cal].filter(v => v !== null).length !== 3) {
+            alert("Please fill exactly 3 boxes.");
             return;
         }
 
-        const p = inputs[0].val;
-        const c = inputs[1].val;
-        const f = inputs[2].val;
-        const cal = inputs[3].val;
+        let resP = p, resC = c, resF = f, resCal = cal;
 
         if (cal === null) {
-            calI.value = Math.round((p * 4) + (c * 4) + (f * 9));
-            calI.classList.add('calculated-field');
+            resCal = Math.round((p * 4) + (c * 4) + (f * 9));
+            calI.value = resCal; calI.classList.add('calculated-field');
         } else if (p === null) {
-            pI.value = ((cal - (c * 4) - (f * 9)) / 4).toFixed(1);
-            pI.classList.add('calculated-field');
+            resP = ((cal - (c * 4) - (f * 9)) / 4).toFixed(1);
+            pI.value = resP; pI.classList.add('calculated-field');
         } else if (c === null) {
-            cI.value = ((cal - (p * 4) - (f * 9)) / 4).toFixed(1);
-            cI.classList.add('calculated-field');
+            resC = ((cal - (p * 4) - (f * 9)) / 4).toFixed(1);
+            cI.value = resC; cI.classList.add('calculated-field');
         } else if (f === null) {
-            fI.value = ((cal - (p * 4) - (c * 4)) / 9).toFixed(1);
-            fI.classList.add('calculated-field');
+            resF = ((cal - (p * 4) - (c * 4)) / 9).toFixed(1);
+            fI.value = resF; fI.classList.add('calculated-field');
+        }
+
+        saveToHistory(resP, resC, resF, resCal);
+    }
+
+    function saveToHistory(p, c, f, cal) {
+        let history = JSON.parse(localStorage.getItem('macroHistory') || '[]');
+        const entry = { p, c, f, cal, id: Date.now(), time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) };
+        history.unshift(entry);
+        if(history.length > 5) history.pop();
+        localStorage.setItem('macroHistory', JSON.stringify(history));
+        displayHistory();
+    }
+
+    function displayHistory() {
+        const list = document.getElementById('historyList');
+        let history = JSON.parse(localStorage.getItem('macroHistory') || '[]');
+        list.innerHTML = history.length ? '' : '<p style="color:#48484a; font-size:0.8rem; text-align:center;">No history</p>';
+        
+        history.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'history-item';
+            div.innerHTML = `
+                <div class="history-click-area" onclick='restoreHistory(${JSON.stringify(item)})'>
+                    <div class="history-data">
+                        <span class="history-time">${item.time}</span>
+                        <span>P: ${item.p}g | C: ${item.c}g | F: ${item.f}g</span>
+                    </div>
+                    <div class="history-cal">${item.cal}</div>
+                </div>
+                <div class="delete-btn" onclick="deleteEntry(${item.id})">×</div>
+            `;
+            list.appendChild(div);
+        });
+    }
+
+    function deleteEntry(id) {
+        let history = JSON.parse(localStorage.getItem('macroHistory') || '[]');
+        history = history.filter(item => item.id !== id);
+        localStorage.setItem('macroHistory', JSON.stringify(history));
+        displayHistory();
+    }
+
+    function restoreHistory(item) {
+        document.getElementById('protein').value = item.p;
+        document.getElementById('carbs').value = item.c;
+        document.getElementById('fats').value = item.f;
+        document.getElementById('calories').value = item.cal;
+        
+        document.querySelectorAll('input').forEach(i => {
+            i.classList.add('calculated-field');
+            setTimeout(() => i.classList.remove('calculated-field'), 800);
+        });
+    }
+
+    function clearAllHistory() {
+        if(confirm("Delete all history?")) {
+            localStorage.removeItem('macroHistory');
+            displayHistory();
         }
     }
 
-    function subtractMilk() {
-        let p = parseFloat(document.getElementById('protein').value) || 0;
-        let c = parseFloat(document.getElementById('carbs').value) || 0;
-        let f = parseFloat(document.getElementById('fats').value) || 0;
-        let cal = parseFloat(document.getElementById('calories').value) || 0;
-        
-        document.getElementById('adj-p').innerText = (p - MILK.p).toFixed(1) + "g";
-        document.getElementById('adj-c').innerText = (c - MILK.c).toFixed(1) + "g";
-        document.getElementById('adj-f').innerText = (f - MILK.f).toFixed(1) + "g";
-        document.getElementById('adj-cal').innerText = Math.round(cal - MILK.cal);
-        document.getElementById('adjusted-box').style.display = 'block';
-    }
-
     function clearFields() {
-        document.querySelectorAll('input').forEach(i => { 
-            i.value = ''; 
-            i.classList.remove('calculated-field'); 
-        });
-        document.getElementById('adjusted-box').style.display = 'none';
-    }
-
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js').then(() => {
-                const bar = document.getElementById('status-bar');
-                bar.innerText = "✓ Macro Calculator Ready";
-                bar.style.color = "#32d74b";
-            });
-        });
+        document.querySelectorAll('input').forEach(i => { i.value = ''; i.classList.remove('calculated-field'); });
     }
 </script>
 </body>
