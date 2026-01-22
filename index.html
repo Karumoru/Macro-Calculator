@@ -20,7 +20,6 @@
         input { width: 100%; padding: 14px; border: 1px solid var(--border); border-radius: 12px; box-sizing: border-box; font-size: 1.1rem; background: #2c2c2e; color: white; outline: none; }
         .calculated-field { background-color: #1c2e21 !important; border-color: var(--success) !important; color: var(--success) !important; font-weight: bold; }
         
-        /* Updated Button Layout */
         .buttons { display: flex; gap: 8px; margin-top: 1.5rem; }
         button { border: none; border-radius: 12px; cursor: pointer; font-size: 1rem; font-weight: 600; transition: opacity 0.2s; }
         button:active { opacity: 0.6; }
@@ -54,7 +53,7 @@
     <div class="buttons">
         <button id="calcBtn" onclick="calculate()">Calculate</button>
         <button id="clearBtn" onclick="clearFields()">Clear</button>
-        <button id="milkBtn" onclick="subtractMilk()" title="Subtract Milk">🥛</button>
+        <button id="milkBtn" onclick="subtractMilk()" title="Toggle Milk Adjustment">🥛</button>
     </div>
     <div id="adjusted-box">
         <h3 style="color: var(--error); margin: 0 0 12px 0; font-size: 0.9rem;">Adjusted (minus milk)</h3>
@@ -86,15 +85,25 @@
     }
 
     function subtractMilk() {
+        const box = document.getElementById('adjusted-box');
+        
+        // Toggle Logic: If it's already showing, hide it and exit.
+        if (box.style.display === 'block') {
+            box.style.display = 'none';
+            return;
+        }
+
         let p = parseFloat(document.getElementById('protein').value) || 0;
         let c = parseFloat(document.getElementById('carbs').value) || 0;
         let f = parseFloat(document.getElementById('fats').value) || 0;
         let cal = parseFloat(document.getElementById('calories').value) || 0;
+        
         document.getElementById('adj-p').innerText = (p - MILK.p).toFixed(1) + "g";
         document.getElementById('adj-c').innerText = (c - MILK.c).toFixed(1) + "g";
         document.getElementById('adj-f').innerText = (f - MILK.f).toFixed(1) + "g";
         document.getElementById('adj-cal').innerText = Math.round(cal - MILK.cal);
-        document.getElementById('adjusted-box').style.display = 'block';
+        
+        box.style.display = 'block';
     }
 
     function saveToHistory(p, c, f, cal) {
@@ -126,6 +135,8 @@
     function restoreHistory(item) {
         document.getElementById('protein').value = item.p; document.getElementById('carbs').value = item.c; document.getElementById('fats').value = item.f; document.getElementById('calories').value = item.cal;
         document.querySelectorAll('input').forEach(i => { i.classList.add('calculated-field'); setTimeout(() => i.classList.remove('calculated-field'), 800); });
+        // Hide adjusted box on restore for a clean start
+        document.getElementById('adjusted-box').style.display = 'none';
     }
 
     function clearAllHistory() { if(confirm("Delete all history?")) { localStorage.removeItem('macroHistory'); displayHistory(); } }
