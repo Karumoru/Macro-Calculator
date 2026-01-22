@@ -1,4 +1,4 @@
-const cacheName = 'macro-v15';
+const cacheName = 'macro-v16';
 const assets = [
   './',
   './index.html',
@@ -25,6 +25,7 @@ self.addEventListener('fetch', (e) => {
     })
   );
 });
+
 
 
 
